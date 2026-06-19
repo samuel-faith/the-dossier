@@ -64,6 +64,22 @@ async function footballGet(endpoint) {
   return res.json();
 }
 
+function formatTeamForm(finishedMatches, teamName) {
+  const played = (finishedMatches || []).filter(m =>
+    m.homeTeam.name === teamName || m.awayTeam.name === teamName
+  );
+  if (played.length === 0) return '  No matches played yet in this tournament';
+  return played.map(m => {
+    const isHome    = m.homeTeam.name === teamName;
+    const opponent  = isHome ? m.awayTeam.name : m.homeTeam.name;
+    const goalsFor  = isHome ? m.score.fullTime.home : m.score.fullTime.away;
+    const goalsAgt  = isHome ? m.score.fullTime.away : m.score.fullTime.home;
+    const outcome   = goalsFor > goalsAgt ? 'Won' : goalsFor < goalsAgt ? 'Lost' : 'Drew';
+    const dateLabel = toEasternDateLabel(new Date(m.utcDate));
+    return `  ${outcome} ${goalsFor}–${goalsAgt} vs ${opponent} (${dateLabel})`;
+  }).join('\n');
+}
+
 function formatStandings(standingsData, matchGroup) {
   if (!standingsData?.standings || !matchGroup) return '';
   const entry = standingsData.standings.find(s => s.group === matchGroup);
@@ -78,7 +94,7 @@ function formatStandings(standingsData, matchGroup) {
 
 // ── Claude call ───────────────────────────────────────────────────────────────
 
-async function generatePreviewContent(match, standingsText) {
+async function generatePreviewContent(match, standingsText, formData) {
   const homeName   = match.homeTeam.name;
   const awayName   = match.awayTeam.name;
   const kickoff    = new Date(match.utcDate);
@@ -95,6 +111,7 @@ MATCH DATA:
 - Competition: FIFA World Cup 2026, ${groupLabel}
 - Kickoff: ${dateLabel}${match.venue ? `\n- Venue: ${match.venue}` : ''}
 - Neutral venue: WC 2026 is hosted across the USA, Canada, and Mexico. Do not reference home advantage or home crowd for either side unless the team IS the USA, Canada, or Mexico playing in their own country.
+${formData ? `\nTOURNAMENT FORM (actual results from the API — use these, do not invent results):\n${homeName}:\n${formData.home}\n${awayName}:\n${formData.away}` : ''}
 ${standingsText ? `\nGROUP STANDINGS:\n${standingsText}` : ''}
 
 Return ONLY raw JSON (no markdown fences) with this exact shape:
@@ -267,6 +284,15 @@ async function main() {
     console.warn('Standings unavailable (tournament may not have started):', e.message);
   }
 
+  let finishedMatches = [];
+  try {
+    const { matches: fm } = await footballGet('/competitions/WC/matches?status=FINISHED');
+    finishedMatches = fm || [];
+    console.log(`  ${finishedMatches.length} finished match(es) loaded for form context.`);
+  } catch (e) {
+    console.warn('Finished matches unavailable:', e.message);
+  }
+
   const generated = [];
   const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -284,7 +310,11 @@ async function main() {
 
     try {
       const standingsText = formatStandings(standingsData, match.group);
-      const content       = await generatePreviewContent(match, standingsText);
+      const formData = {
+        home: formatTeamForm(finishedMatches, homeName),
+        away: formatTeamForm(finishedMatches, awayName),
+      };
+      const content = await generatePreviewContent(match, standingsText, formData);
       const html          = buildPreviewHTML(match, content, livePosts);
 
       fs.writeFileSync(path.join(DRAFTS_DIR, `${slug}.html`), html, 'utf-8');
