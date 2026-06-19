@@ -4,18 +4,18 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const fs   = require('fs');
 const path = require('path');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 const { escHtml, escAttr, buildRelatedMatchesHTML, buildPreviewBacklinkHTML } = require('./lib');
 
 const FOOTBALL_API_KEY = process.env.FOOTBALL_DATA_API_KEY;
-const GEMINI_API_KEY   = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY     = process.env.GROQ_API_KEY;
 
 const ROOT        = path.join(__dirname, '..');
 const DRAFTS_DIR  = path.join(ROOT, 'drafts');
 const POSTS_JSON  = path.join(ROOT, 'posts.json');
 const VOICE_GUIDE = fs.readFileSync(path.join(__dirname, 'voice-guide.md'), 'utf-8');
 
-const genai = new GoogleGenerativeAI(GEMINI_API_KEY);
+const groq = new Groq({ apiKey: GROQ_API_KEY });
 
 // Approximate pre-tournament top-10 for the upset check when API omits rankings
 const TOP_10 = new Set([
@@ -104,12 +104,13 @@ async function generateRecapContent(match, previewSlug, priorPrediction) {
   const prompt = `Write a match REPORT for this completed World Cup 2026 fixture.
 
 MATCH DATA:
-- Home: ${homeName}
-- Away: ${awayName}
+- Team 1: ${homeName}
+- Team 2: ${awayName}
 - Result: ${homeName} ${homeScore}–${awayScore} ${awayName}
 - Outcome: ${winner === 'a draw' ? 'Draw' : `${winner} win`}
 - Competition: FIFA World Cup 2026, ${groupLabel}
 - Date: ${dateLabel}${match.venue ? `\n- Venue: ${match.venue}` : ''}
+- Neutral venue: WC 2026 is hosted across the USA, Canada, and Mexico. Do not reference home advantage or home crowd for either side unless the team IS the USA, Canada, or Mexico playing in their own country.
 ${predictionLine}
 
 RECAP RULES (override preview rules for this article):
@@ -136,13 +137,18 @@ Return ONLY raw JSON (no markdown fences) with this exact shape:
   "pullQuote": "punchy one-liner about the match"
 }`;
 
-  const model = genai.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    systemInstruction: VOICE_GUIDE,
+  const completion = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [
+      { role: 'system', content: VOICE_GUIDE },
+      { role: 'user', content: prompt },
+    ],
+    temperature: 0.7,
+    max_tokens: 2000,
   });
-
-  const result = await model.generateContent(prompt);
-  const raw = result.response.text().trim().replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '');
+  const raw = completion.choices[0].message.content.trim()
+    .replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '')
+    .replace(/,(\s*[}\]])/g, '$1');
   return JSON.parse(raw);
 }
 
@@ -246,7 +252,7 @@ ${relatedHTML}
 
 async function main() {
   if (!FOOTBALL_API_KEY) { console.error('Missing FOOTBALL_DATA_API_KEY in .env'); process.exit(1); }
-  if (!GEMINI_API_KEY)   { console.error('Missing GEMINI_API_KEY in .env'); process.exit(1); }
+  if (!GROQ_API_KEY)     { console.error('Missing GROQ_API_KEY in .env'); process.exit(1); }
 
   if (!fs.existsSync(DRAFTS_DIR)) fs.mkdirSync(DRAFTS_DIR, { recursive: true });
 
