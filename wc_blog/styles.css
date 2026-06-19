@@ -1,0 +1,409 @@
+/* ===========================================================
+   THE DOSSIER — World Cup 2026 Match Preview Blog
+   Design system: matchday dossier / stadium scoreboard
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --pitch-black: #0E1812;
+  --surface: #16241C;
+  --surface-raised: #1C2D22;
+  --chalk: #F3F0E6;
+  --chalk-dim: #C9C5B6;
+  --amber: #E2A33C;
+  --amber-deep: #B97D22;
+  --red: #C1453B;
+  --mist: #8FA89A;
+  --border: rgba(243, 240, 230, 0.12);
+  --border-strong: rgba(243, 240, 230, 0.22);
+
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'Source Serif 4', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--pitch-black);
+  color: var(--chalk);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--amber); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; display: block; }
+
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Nav ---------- */
+.site-nav {
+  border-bottom: 1px solid var(--border);
+  padding: 22px 0;
+}
+.site-nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand-block { display: flex; flex-direction: column; line-height: 1.15; }
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--chalk);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.brand span { color: var(--amber); }
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mist);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.brand-sub a { color: var(--mist); border-bottom: 1px dotted var(--mist); }
+.brand-sub a:hover { color: var(--amber); border-color: var(--amber); }
+.nav-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--mist);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.nav-cta {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pitch-black);
+  background: var(--amber);
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-weight: 500;
+  margin-left: 16px;
+}
+.nav-cta:hover { background: var(--chalk); text-decoration: none; }
+.nav-right { display: flex; align-items: center; gap: 4px; }
+
+/* ---------- In-article Foreshot CTA banner ---------- */
+.foreshot-cta {
+  background: var(--surface-raised);
+  border: 1px solid var(--amber-deep);
+  border-radius: 4px;
+  padding: 22px 26px;
+  margin: 38px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.foreshot-cta .text {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--chalk);
+}
+.foreshot-cta .text strong { color: var(--amber); font-weight: 600; }
+.foreshot-cta .cta-btn {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pitch-black);
+  background: var(--amber);
+  padding: 11px 20px;
+  border-radius: 3px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.foreshot-cta .cta-btn:hover { background: var(--chalk); text-decoration: none; }
+
+/* ---------- Halfway-line divider (signature motif) ---------- */
+.pitch-divider {
+  width: 100%;
+  height: 28px;
+  margin: 8px 0;
+  display: block;
+}
+.pitch-divider line, .pitch-divider circle {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  fill: none;
+}
+
+/* ---------- Scoreboard hero ---------- */
+.hero {
+  padding: 56px 0 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--amber);
+  color: #3A2705;
+  padding: 4px 10px;
+  border-radius: 2px;
+  margin-bottom: 22px;
+}
+.scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  text-align: center;
+  margin: 10px 0 18px;
+}
+.scoreboard .team {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(26px, 5vw, 42px);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.scoreboard .digits {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(30px, 6vw, 48px);
+  color: var(--amber);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  padding: 4px 18px;
+  border-radius: 4px;
+  min-width: 1.6em;
+}
+.hero-meta {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--mist);
+  letter-spacing: 0.03em;
+}
+.hero-meta .sep { margin: 0 8px; opacity: 0.5; }
+.hero-cta {
+  text-align: center;
+  margin-top: 26px;
+}
+.btn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pitch-black);
+  background: var(--chalk);
+  padding: 11px 22px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.btn:hover { background: var(--amber); text-decoration: none; }
+
+/* ---------- Post grid (index page) ---------- */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mist);
+  margin: 48px 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+  margin-bottom: 50px;
+}
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 22px;
+  display: block;
+  color: var(--chalk);
+}
+.post-card:hover {
+  border-color: var(--border-strong);
+  text-decoration: none;
+}
+.post-card .tag-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mist);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+.post-card .tag-row .group-tag { color: var(--amber); }
+.post-card .fixture {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+.post-card .hook {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  color: var(--chalk-dim);
+  margin: 0 0 16px;
+  line-height: 1.55;
+}
+.post-card .pred-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--amber);
+  border: 1px solid var(--amber-deep);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ---------- Article page ---------- */
+.article-header { padding: 48px 0 0; }
+.article-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 14px;
+}
+.article-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 5vw, 44px);
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin: 0 0 18px;
+}
+.article-meta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--mist);
+  margin-bottom: 8px;
+}
+.article-body { padding: 30px 0 10px; }
+.article-body p {
+  margin: 0 0 20px;
+  font-size: 18px;
+}
+.article-body h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--amber);
+  margin: 38px 0 16px;
+}
+.pull-quote {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--chalk);
+  border-left: 3px solid var(--amber);
+  padding: 4px 0 4px 24px;
+  margin: 32px 0;
+}
+.pull-quote .quote-mark { color: var(--amber); font-style: normal; }
+
+/* ---------- Prediction scoreboard (signature element) ---------- */
+.predict-box {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 26px 28px;
+  margin: 38px 0;
+  text-align: center;
+}
+.predict-box .label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mist);
+  margin-bottom: 14px;
+}
+.predict-box .score-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.predict-box .team-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.predict-box .digits {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 34px;
+  color: var(--amber);
+  background: var(--pitch-black);
+  border: 1px solid var(--border-strong);
+  padding: 2px 16px;
+  border-radius: 4px;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 60px;
+  padding: 30px 0 50px;
+  text-align: center;
+}
+.site-footer p {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--mist);
+  margin: 4px 0;
+}
+.back-link {
+  display: inline-block;
+  margin: 40px 0 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--mist);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .article-body p { font-size: 17px; }
+  .scoreboard { gap: 12px; }
+  .scoreboard .digits { padding: 4px 12px; }
+  .site-nav .wrap { flex-wrap: wrap; gap: 12px; }
+  .nav-right { width: 100%; justify-content: space-between; margin-left: 0; }
+  .nav-cta { margin-left: 0; }
+  .nav-tag { display: none; }
+  .foreshot-cta { flex-direction: column; align-items: flex-start; }
+}

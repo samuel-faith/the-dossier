@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "brazil-vs-haiti",
+    "group": "Group C",
+    "date": "2026-06-19",
+    "dateLabel": "Jun 19",
+    "fixture": "Brazil vs Haiti",
+    "hook": "A five-time champion against World Cup debutants — but Ancelotti's side cannot afford to treat this as a formality after a stuttering opener.",
+    "predictedScore": "4-0",
+    "type": "preview",
+    "featured": true,
+    "venue": "Lincoln Financial Field, Philadelphia",
+    "kickoffLabel": "Friday, June 19"
+  },
+  {
+    "slug": "argentina-vs-austria",
+    "group": "Group J",
+    "date": "2026-06-22",
+    "dateLabel": "Jun 22",
+    "fixture": "Argentina vs Austria",
+    "hook": "The defending champions open their title defence against a Rangnick side built specifically to make favourites uncomfortable.",
+    "predictedScore": "2-0",
+    "type": "preview",
+    "featured": false
+  },
+  {
+    "slug": "france-vs-iraq",
+    "group": "Group I",
+    "date": "2026-06-22",
+    "dateLabel": "Jun 22",
+    "fixture": "France vs Iraq",
+    "hook": "Forty years in the making — Iraq's return to the World Cup stage runs straight into a rampant France attack.",
+    "predictedScore": "5-0",
+    "type": "preview",
+    "featured": false
+  }
+]

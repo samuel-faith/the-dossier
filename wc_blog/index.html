@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dossier — World Cup 2026 Match Previews</title>
+<meta name="description" content="Tactical match previews for every World Cup 2026 fixture. No fluff, no filler — just the storylines, the matchups, and the predictions.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap" style="display:flex; align-items:center; justify-content:space-between;">
+    <div class="brand-block">
+      <a href="index.html" class="brand">THE <span>DOSSIER</span></a>
+      <span class="brand-sub">by <a href="https://foreshot.net">Foreshot</a></span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-tag">World Cup 2026 · Match Previews</span>
+      <a href="https://foreshot.net" class="nav-cta">Play on Foreshot →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="hero">
+  <div class="wrap">
+    <div style="text-align:center;">
+      <span class="hero-eyebrow" id="hero-eyebrow">Next up</span>
+    </div>
+    <div class="scoreboard" id="hero-scoreboard">
+      <!-- rendered by script -->
+    </div>
+    <p class="hero-meta" id="hero-meta"></p>
+    <div class="hero-cta">
+      <a href="#" id="hero-link" class="btn">Read the preview →</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2 class="section-label">Latest previews</h2>
+  <div class="post-grid" id="post-grid">
+    <!-- rendered by script -->
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>THE DOSSIER — tactical match previews, every matchday.</p>
+  <p>Part of <a href="https://foreshot.net">Foreshot</a> — predict scores, win cash.</p>
+</footer>
+
+<script>
+fetch('posts.json')
+  .then(r => r.json())
+  .then(posts => {
+    posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const featured = posts.find(p => p.featured) || posts[0];
+    if (featured) {
+      const [predHome, predAway] = (featured.predictedScore || '0-0').split('-');
+      const teams = featured.fixture.split(' vs ');
+      document.getElementById('hero-eyebrow').textContent =
+        featured.type === 'recap' ? 'Just played' : 'Next up';
+      document.getElementById('hero-scoreboard').innerHTML = `
+        <span class="team">${teams[0]}</span>
+        <span class="digits">${predHome}</span>
+        <span style="font-family:var(--font-mono); color:var(--mist);">—</span>
+        <span class="digits">${predAway}</span>
+        <span class="team">${teams[1]}</span>
+      `;
+      document.getElementById('hero-meta').textContent =
+        `${featured.group.toUpperCase()} · ${featured.kickoffLabel || featured.dateLabel} ${featured.venue ? '· ' + featured.venue.toUpperCase() : ''}`;
+      document.getElementById('hero-link').href = `posts/${featured.slug}.html`;
+    }
+
+    const grid = document.getElementById('post-grid');
+    grid.innerHTML = posts.map(p => `
+      <a href="posts/${p.slug}.html" class="post-card">
+        <div class="tag-row">
+          <span class="group-tag">${p.group}</span>
+          <span>${p.dateLabel}</span>
+        </div>
+        <h3 class="fixture">${p.fixture}</h3>
+        <p class="hook">${p.hook}</p>
+        <span class="pred-chip">${p.type === 'recap' ? 'Final' : 'Predicted'}: ${p.predictedScore}</span>
+      </a>
+    `).join('');
+  })
+  .catch(err => {
+    document.getElementById('post-grid').innerHTML =
+      '<p style="color:var(--mist); font-family:var(--font-mono); font-size:13px;">Could not load previews. Check posts.json.</p>';
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
