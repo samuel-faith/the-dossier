@@ -1,0 +1,67 @@
+name: Daily content drafts
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: wc_blog
+
+      - name: Generate preview drafts
+        run: node scripts/generate-previews.js
+        working-directory: wc_blog
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SITE_URL: https://dossier.foreshot.net
+
+      - name: Generate recap drafts
+        run: node scripts/generate-recaps.js
+        working-directory: wc_blog
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SITE_URL: https://dossier.foreshot.net
+
+      - name: Stage all drafts (move to posts/, update posts.json, rebuild sitemap)
+        run: node scripts/publish.js --all --stage-only
+        working-directory: wc_blog
+        env:
+          SITE_URL: https://dossier.foreshot.net
+
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto-drafts
+          title: "New Dossier drafts — review and merge"
+          commit-message: "Add generated match content"
+          body: |
+            Automated drafts from the daily workflow.
+
+            **Review this diff before merging.** Each file in `wc_blog/posts/` added by this PR was AI-generated. Check for:
+            - Wrong scores or fabricated stats
+            - Misspelled player or team names
+            - Stale injury or transfer references
+
+            Merging = approving everything in this PR. If any single draft is wrong, close without merging, fix the file locally, and re-run `publish.js` by hand.
+
+            ---
+            Vercel redeploys automatically on merge to `main`.
+          labels: draft,automated
+          delete-branch: true

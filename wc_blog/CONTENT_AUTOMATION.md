@@ -154,11 +154,103 @@ Pull Request with the new files in `/drafts` — NOT a direct commit to
 main. You still review and merge manually. Ask Claude Code to scaffold
 this workflow file once the two scripts above are working locally.
 
+## The approval flow — GitHub Pull Request (recommended)
+
+This is the version that feels "automatic" without ever risking an
+unreviewed article going live. Instead of running scripts manually and
+publishing yourself, let GitHub do the scheduling and the review happens
+as a single click.
+
+**Set up `.github/workflows/daily-drafts.yml`** to run on a schedule
+(e.g. every morning at 7am UTC):
+
+```yaml
+name: Daily content drafts
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: node scripts/generate-previews.js
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - run: node scripts/generate-recaps.js
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - run: node scripts/publish.js --all --stage-only
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto-drafts
+          title: "New Dossier drafts — review and merge"
+          commit-message: "Add generated match content"
+```
+
+Add your two API keys as GitHub repo secrets (Settings → Secrets and
+variables → Actions → New repository secret) — never put real keys
+directly in the workflow file.
+
+**What this means day to day:**
+
+1. Every morning, the Action runs on its own — you don't lift a finger
+2. If there's new content, it shows up as a Pull Request on your repo
+3. You open the PR on GitHub.com, read the new file(s) in the diff view
+4. Looks good → click **Merge pull request**. That's your approval.
+5. Merging to `main` triggers Vercel's existing GitHub integration,
+   which deploys automatically — same as any normal push
+6. Nothing wrong → close the PR without merging, no harm done
+
+The only manual step in the entire pipeline is reading the diff and
+clicking one button. Everything else — fetching fixtures, writing
+drafts, updating `posts.json`, deploying — runs unattended.
+
+## Internal linking (automate this) vs backlinks (can't be automated)
+
+**Internal linking — build this into the generation scripts:**
+
+1. **Recap → preview link.** When `generate-recaps.js` finds a match that
+   already has a preview in `posts.json`, the recap's opening section
+   must include a direct link back to that preview article and quote
+   the original predicted score for the "we called it X, it finished Y"
+   line.
+
+2. **Related matches footer.** Every generated article (preview or
+   recap) gets a "Related previews" block before the footer, linking to
+   2-3 other posts — prioritise same-group matches first, then most
+   recent posts. Pull these from `posts.json`, don't hardcode them.
+
+3. **sitemap.xml.** Add a `generate-sitemap.js` script (or fold this
+   into `publish.js`) that rebuilds `sitemap.xml` at the repo root every
+   time a post is published, listing every URL in `posts.json` plus the
+   homepage. Submit this once to Google Search Console after your first
+   real batch of posts — after that it stays current automatically.
+
+**Backlinks are not a code problem — don't try to automate them.**
+Backlinks come from real people linking to your articles from elsewhere:
+Facebook shares, WhatsApp forwards, someone quoting a prediction. No
+script can manufacture that. The honest growth path is the same
+distribution you're already doing for Foreshot itself — post the article
+link on Facebook and WhatsApp groups every time one goes live, and
+consider cross-posting summaries to football communities where
+self-promotion is allowed. Internal linking and the sitemap simply make
+sure that when people DO arrive, Google can find and rank every page.
+
 ## What NOT to automate
 
-Do not wire `publish.js` into the scheduled job. Do not let drafts merge
-to `main` without you opening the file and reading it once. A wrong score,
-a misspelled player name, or a hallucinated stat undermines the one thing
-this blog is selling — that you know football well enough to be trusted
-with predictions. That trust is also what makes someone click through to
-Foreshot. Five extra minutes of reading a draft protects the entire funnel.
+Never let the workflow auto-merge its own Pull Request — that defeats
+the entire point of the review step. A wrong score, a misspelled player
+name, or a hallucinated stat undermines the one thing this blog is
+selling — that you know football well enough to be trusted with
+predictions. That trust is also what makes someone click through to
+Foreshot. The five seconds it takes to read a diff and click Merge
+protects the entire funnel.

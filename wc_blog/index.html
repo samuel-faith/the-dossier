@@ -82,7 +82,7 @@ fetch('posts.json')
         </div>
         <h3 class="fixture">${p.fixture}</h3>
         <p class="hook">${p.hook}</p>
-        <span class="pred-chip">${p.type === 'recap' ? 'Final' : 'Predicted'}: ${p.predictedScore}</span>
+        <span class="pred-chip">${p.type === 'recap' ? `Final: ${p.result || p.predictedScore || ''}` : `Predicted: ${p.predictedScore}`}</span>
       </a>
     `).join('');
   })
