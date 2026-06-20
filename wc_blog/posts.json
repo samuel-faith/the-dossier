@@ -1,5 +1,27 @@
 [
   {
+    "slug": "switzerland-vs-bosnia-herzegovina-recap",
+    "group": "Group B",
+    "date": "2026-06-18",
+    "dateLabel": "Jun 18",
+    "fixture": "Switzerland vs Bosnia-Herzegovina",
+    "hook": "Switzerland secures convincing win over Bosnia-Herzegovina",
+    "type": "recap",
+    "featured": false,
+    "result": "4-1"
+  },
+  {
+    "slug": "canada-vs-qatar-recap",
+    "group": "Group B",
+    "date": "2026-06-18",
+    "dateLabel": "Jun 18",
+    "fixture": "Canada vs Qatar",
+    "hook": "Canada routs Qatar in World Cup 2026 Group B",
+    "type": "recap",
+    "featured": false,
+    "result": "6-0"
+  },
+  {
     "slug": "uruguay-vs-cape-verde-islands",
     "group": "Group H",
     "date": "2026-06-21",
