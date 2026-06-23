@@ -37,10 +37,26 @@
   </div>
 </header>
 
+<section class="foreshot-banner">
+  <div class="wrap">
+    <div class="foreshot-banner__inner">
+      <div class="foreshot-banner__text">
+        <p class="foreshot-banner__label">Foreshot · World Cup 2026</p>
+        <h2 class="foreshot-banner__heading">Think you know the score?</h2>
+        <p class="foreshot-banner__body">Predict every World Cup 2026 result. Win cash for every correct score.</p>
+      </div>
+      <a href="https://foreshot.net" class="foreshot-banner__btn">Start predicting →</a>
+    </div>
+  </div>
+</section>
+
 <main class="wrap">
-  <h2 class="section-label">Latest previews</h2>
+  <h2 class="section-label" id="grid-label">Latest previews</h2>
   <div class="post-grid" id="post-grid">
     <!-- rendered by script -->
+  </div>
+  <div id="show-all-wrap" style="display:none; text-align:center; margin-bottom:50px;">
+    <button class="show-all-btn" id="show-all-btn">Show all previews</button>
   </div>
 </main>
 
@@ -53,14 +69,23 @@
 fetch('posts.json')
   .then(r => r.json())
   .then(posts => {
-    posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const today = new Date().toISOString().slice(0, 10);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
 
-    const featured = posts.find(p => p.featured) || posts[0];
+    // Sort all posts: upcoming first (asc), then past (desc)
+    const upcoming = posts.filter(p => p.date >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const past     = posts.filter(p => p.date <  today).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted   = [...upcoming, ...past];
+
+    // Hero: next upcoming match, or most recent if none
+    const featured = upcoming[0] || past[0];
     if (featured) {
       const [predHome, predAway] = (featured.predictedScore || '0-0').split('-');
       const teams = featured.fixture.split(' vs ');
       document.getElementById('hero-eyebrow').textContent =
-        featured.type === 'recap' ? 'Just played' : 'Next up';
+        featured.date >= today ? 'Next up' : featured.type === 'recap' ? 'Just played' : 'Latest';
       document.getElementById('hero-scoreboard').innerHTML = `
         <span class="team">${teams[0]}</span>
         <span class="digits">${predHome}</span>
@@ -69,22 +94,40 @@ fetch('posts.json')
         <span class="team">${teams[1]}</span>
       `;
       document.getElementById('hero-meta').textContent =
-        `${featured.group.toUpperCase()} · ${featured.kickoffLabel || featured.dateLabel} ${featured.venue ? '· ' + featured.venue.toUpperCase() : ''}`;
+        `${featured.group.toUpperCase()} · ${featured.kickoffLabel || featured.dateLabel}${featured.venue ? ' · ' + featured.venue.toUpperCase() : ''}`;
       document.getElementById('hero-link').href = `posts/${featured.slug}.html`;
     }
 
-    const grid = document.getElementById('post-grid');
-    grid.innerHTML = posts.map(p => `
-      <a href="posts/${p.slug}.html" class="post-card">
-        <div class="tag-row">
-          <span class="group-tag">${p.group}</span>
-          <span>${p.dateLabel}</span>
-        </div>
-        <h3 class="fixture">${p.fixture}</h3>
-        <p class="hook">${p.hook}</p>
-        <span class="pred-chip">${p.type === 'recap' ? `Final: ${p.result || p.predictedScore || ''}` : `Predicted: ${p.predictedScore}`}</span>
-      </a>
-    `).join('');
+    // Grid: recent (last 7 days) + upcoming only
+    const recent = sorted.filter(p => p.date >= cutoffStr);
+    const hasOlder = sorted.length > recent.length;
+
+    function renderGrid(list) {
+      const grid = document.getElementById('post-grid');
+      grid.innerHTML = list.map(p => `
+        <a href="posts/${p.slug}.html" class="post-card">
+          <div class="tag-row">
+            <span class="group-tag">${p.group}</span>
+            <span>${p.dateLabel}</span>
+          </div>
+          <h3 class="fixture">${p.fixture}</h3>
+          <p class="hook">${p.hook}</p>
+          <span class="pred-chip">${p.type === 'recap' ? `Final: ${p.result || p.predictedScore || ''}` : `Predicted: ${p.predictedScore}`}</span>
+        </a>
+      `).join('');
+    }
+
+    renderGrid(recent.length ? recent : sorted.slice(0, 9));
+
+    if (hasOlder) {
+      const wrap = document.getElementById('show-all-wrap');
+      wrap.style.display = 'block';
+      document.getElementById('show-all-btn').addEventListener('click', () => {
+        renderGrid(sorted);
+        wrap.style.display = 'none';
+        document.getElementById('grid-label').textContent = 'All previews';
+      });
+    }
   })
   .catch(err => {
     document.getElementById('post-grid').innerHTML =

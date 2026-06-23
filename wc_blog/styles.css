@@ -419,6 +419,75 @@ img { max-width: 100%; display: block; }
 }
 .preview-backlink a { color: var(--amber); }
 
+/* ---------- Foreshot homepage banner ---------- */
+.foreshot-banner {
+  background: var(--surface-raised);
+  border-top: 1px solid var(--amber-deep);
+  border-bottom: 1px solid var(--amber-deep);
+  padding: 32px 0;
+  margin: 0 0 8px;
+}
+.foreshot-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.foreshot-banner__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 8px;
+}
+.foreshot-banner__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 3vw, 28px);
+  text-transform: uppercase;
+  color: var(--chalk);
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+.foreshot-banner__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--chalk-dim);
+  margin: 0;
+}
+.foreshot-banner__btn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pitch-black);
+  background: var(--amber);
+  padding: 14px 28px;
+  border-radius: 3px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.foreshot-banner__btn:hover { background: var(--chalk); text-decoration: none; }
+
+/* ---------- Show all button ---------- */
+.show-all-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mist);
+  background: none;
+  border: 1px solid var(--border-strong);
+  padding: 10px 24px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.show-all-btn:hover { color: var(--chalk); border-color: var(--chalk); }
+
 /* ---------- Footer ---------- */
 .site-footer {
   border-top: 1px solid var(--border);
