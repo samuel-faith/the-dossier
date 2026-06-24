@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Previews & Recaps — The Dossier · World Cup 2026</title>
+<meta name="description" content="Every World Cup 2026 match preview and match report from The Dossier. Sorted by matchday.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap" style="display:flex; align-items:center; justify-content:space-between;">
+    <div class="brand-block">
+      <a href="index.html" class="brand">THE <span>DOSSIER</span></a>
+      <span class="brand-sub">by <a href="https://foreshot.net">Foreshot</a></span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-tag">World Cup 2026 · Match Previews</span>
+      <a href="https://foreshot.net" class="nav-cta">Play on Foreshot →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="archive-header">
+    <h1>All Previews & Recaps</h1>
+    <p id="archive-meta">Loading…</p>
+  </div>
+  <div id="archive-body"></div>
+</main>
+
+<footer class="site-footer">
+  <p>THE DOSSIER — tactical match previews, every matchday.</p>
+  <p>Part of <a href="https://foreshot.net">Foreshot</a> — predict scores, win cash.</p>
+</footer>
+
+<script>
+fetch('posts.json')
+  .then(r => r.json())
+  .then(raw => {
+    // Deduplicate by slug — keep first occurrence (most recently published)
+    const seen = new Set();
+    const posts = raw.filter(p => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Upcoming first (soonest first), then past desc
+    const upcoming = posts.filter(p => p.date >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const past     = posts.filter(p => p.date <  today).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted   = [...upcoming, ...past];
+
+    document.getElementById('archive-meta').textContent =
+      `${sorted.length} piece${sorted.length !== 1 ? 's' : ''} · updated daily`;
+
+    // Group by date
+    const groups = {};
+    for (const p of sorted) {
+      if (!groups[p.date]) groups[p.date] = [];
+      groups[p.date].push(p);
+    }
+
+    function friendlyDate(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+
+    const html = Object.entries(groups).map(([date, items]) => `
+      <div class="archive-date-group">
+        <p class="archive-date-label">${friendlyDate(date)}</p>
+        <ul class="archive-list">
+          ${items.map(p => `
+            <li>
+              <a href="posts/${p.slug}.html">
+                <span class="arc-fixture">${p.fixture}</span>
+                <span class="arc-group">${p.group}</span>
+                <span class="arc-type">${p.type === 'recap' ? 'Report' : 'Preview'}</span>
+              </a>
+            </li>`).join('')}
+        </ul>
+      </div>`).join('');
+
+    document.getElementById('archive-body').innerHTML = html;
+  })
+  .catch(() => {
+    document.getElementById('archive-body').innerHTML =
+      '<p style="color:var(--mist);font-family:var(--font-mono);font-size:13px;">Could not load posts.</p>';
+  });
+</script>
+
+</body>
+</html>

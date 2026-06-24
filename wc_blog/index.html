@@ -27,9 +27,7 @@
     <div style="text-align:center;">
       <span class="hero-eyebrow" id="hero-eyebrow">Next up</span>
     </div>
-    <div class="scoreboard" id="hero-scoreboard">
-      <!-- rendered by script -->
-    </div>
+    <div class="scoreboard" id="hero-scoreboard"></div>
     <p class="hero-meta" id="hero-meta"></p>
     <div class="hero-cta">
       <a href="#" id="hero-link" class="btn">Read the preview →</a>
@@ -51,12 +49,10 @@
 </section>
 
 <main class="wrap">
-  <h2 class="section-label" id="grid-label">Latest previews</h2>
-  <div class="post-grid" id="post-grid">
-    <!-- rendered by script -->
-  </div>
-  <div id="show-all-wrap" style="display:none; text-align:center; margin-bottom:50px;">
-    <button class="show-all-btn" id="show-all-btn">Show all previews</button>
+  <h2 class="section-label">Latest</h2>
+  <div class="post-grid" id="post-grid"></div>
+  <div style="text-align:center; margin: 8px 0 56px;">
+    <a href="archive.html" class="archive-btn">View all previews & recaps →</a>
   </div>
 </main>
 
@@ -68,71 +64,57 @@
 <script>
 fetch('posts.json')
   .then(r => r.json())
-  .then(posts => {
-    const today = new Date().toISOString().slice(0, 10);
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-    const cutoffStr = cutoff.toISOString().slice(0, 10);
+  .then(raw => {
+    // Deduplicate by slug — keep first occurrence
+    const seen = new Set();
+    const posts = raw.filter(p => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
 
-    // Sort all posts: upcoming first (asc), then past (desc)
+    const today = new Date().toISOString().slice(0, 10);
     const upcoming = posts.filter(p => p.date >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
     const past     = posts.filter(p => p.date <  today).sort((a, b) => new Date(b.date) - new Date(a.date));
-    const sorted   = [...upcoming, ...past];
 
-    // Hero: next upcoming match, or most recent if none
+    // Hero: next upcoming or most recent
     const featured = upcoming[0] || past[0];
     if (featured) {
-      const [predHome, predAway] = (featured.predictedScore || '0-0').split('-');
+      const [ph, pa] = (featured.predictedScore || featured.result || '0-0').split('-');
       const teams = featured.fixture.split(' vs ');
       document.getElementById('hero-eyebrow').textContent =
         featured.date >= today ? 'Next up' : featured.type === 'recap' ? 'Just played' : 'Latest';
       document.getElementById('hero-scoreboard').innerHTML = `
         <span class="team">${teams[0]}</span>
-        <span class="digits">${predHome}</span>
-        <span style="font-family:var(--font-mono); color:var(--mist);">—</span>
-        <span class="digits">${predAway}</span>
-        <span class="team">${teams[1]}</span>
-      `;
+        <span class="digits">${ph}</span>
+        <span style="font-family:var(--font-mono);color:var(--mist);">—</span>
+        <span class="digits">${pa}</span>
+        <span class="team">${teams[1]}</span>`;
       document.getElementById('hero-meta').textContent =
         `${featured.group.toUpperCase()} · ${featured.kickoffLabel || featured.dateLabel}${featured.venue ? ' · ' + featured.venue.toUpperCase() : ''}`;
       document.getElementById('hero-link').href = `posts/${featured.slug}.html`;
+      document.getElementById('hero-link').textContent =
+        featured.type === 'recap' ? 'Read the report →' : 'Read the preview →';
     }
 
-    // Grid: recent (last 7 days) + upcoming only
-    const recent = sorted.filter(p => p.date >= cutoffStr);
-    const hasOlder = sorted.length > recent.length;
-
-    function renderGrid(list) {
-      const grid = document.getElementById('post-grid');
-      grid.innerHTML = list.map(p => `
-        <a href="posts/${p.slug}.html" class="post-card">
-          <div class="tag-row">
-            <span class="group-tag">${p.group}</span>
-            <span>${p.dateLabel}</span>
-          </div>
-          <h3 class="fixture">${p.fixture}</h3>
-          <p class="hook">${p.hook}</p>
-          <span class="pred-chip">${p.type === 'recap' ? `Final: ${p.result || p.predictedScore || ''}` : `Predicted: ${p.predictedScore}`}</span>
-        </a>
-      `).join('');
-    }
-
-    renderGrid(recent.length ? recent : sorted.slice(0, 9));
-
-    if (hasOlder) {
-      const wrap = document.getElementById('show-all-wrap');
-      wrap.style.display = 'block';
-      document.getElementById('show-all-btn').addEventListener('click', () => {
-        renderGrid(sorted);
-        wrap.style.display = 'none';
-        document.getElementById('grid-label').textContent = 'All previews';
-      });
-    }
+    // Grid: 6 most recent (upcoming first, then past)
+    const grid6 = [...upcoming, ...past].slice(0, 6);
+    document.getElementById('post-grid').innerHTML = grid6.map(p => `
+      <a href="posts/${p.slug}.html" class="post-card">
+        <div class="tag-row">
+          <span class="group-tag">${p.group}</span>
+          <span>${p.dateLabel}</span>
+        </div>
+        <h3 class="fixture">${p.fixture}</h3>
+        <p class="hook">${p.hook}</p>
+        <span class="pred-chip">${p.type === 'recap'
+          ? `Final: ${p.result || ''}`
+          : `Predicted: ${p.predictedScore}`}</span>
+      </a>`).join('');
   })
-  .catch(err => {
+  .catch(() => {
     document.getElementById('post-grid').innerHTML =
-      '<p style="color:var(--mist); font-family:var(--font-mono); font-size:13px;">Could not load previews. Check posts.json.</p>';
-    console.error(err);
+      '<p style="color:var(--mist);font-family:var(--font-mono);font-size:13px;">Could not load posts.</p>';
   });
 </script>
 

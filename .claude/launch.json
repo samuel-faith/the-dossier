@@ -4,8 +4,9 @@
     {
       "name": "the-dossier",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "wc_blog", "-l", "3000", "--no-clipboard"],
-      "port": 3000
+      "runtimeArgs": ["serve", "wc_blog", "--no-clipboard"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }
