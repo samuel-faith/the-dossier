@@ -181,6 +181,7 @@ function buildPreviewHTML(match, content, livePosts) {
 <title>${escHtml(content.headline)} — The Dossier</title>
 <meta name="description" content="${escAttr(content.metaLine)}">
 <link rel="stylesheet" href="../styles.css">
+<link rel="icon" type="image/png" href="../logo.png">
 </head>
 <body>
 
