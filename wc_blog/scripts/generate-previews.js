@@ -129,11 +129,16 @@ Return ONLY raw JSON (no markdown fences) with this exact shape:
     {"type": "p",  "text": "closing sentence justifying the predicted score"}
   ],
   "pullQuote": "punchy one-liner — analysis, not a real attributed quote",
-  "predictedHome": 2,
-  "predictedAway": 0
+  "predictedHome": <integer>,
+  "predictedAway": <integer>
 }
 
-Do not include the pull-quote or predict-box in the paragraphs array.`;
+PREDICTED SCORE RULES — read carefully:
+- Base the scoreline on the actual team strengths, FIFA rankings, form data, and tactical setup above.
+- World Cup group-stage scorelines are typically tight: 1-0, 1-1, 2-1, 0-0, and 2-0 are all common. 3+ goals is rarer and only fits if there is a clear mismatch.
+- If the teams are evenly matched, a draw (0-0 or 1-1) is a valid and realistic prediction — do not default to a win.
+- NEVER default to 2-0 out of habit. Each game must have a scoreline that reflects the specific matchup.
+- Do not include the pull-quote or predict-box in the paragraphs array.`;
 
   const completion = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
