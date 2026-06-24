@@ -114,6 +114,16 @@ MATCH DATA:
 ${formData ? `\nTOURNAMENT FORM (actual results from the API — use these, do not invent results):\n${homeName}:\n${formData.home}\n${awayName}:\n${formData.away}` : ''}
 ${standingsText ? `\nGROUP STANDINGS:\n${standingsText}` : ''}
 
+PREDICTION FRAMEWORK — work through these before choosing a scoreline:
+1. ATTACKING THREAT: How many goals per game has each team scored in this tournament? Which team has the better attack based on FIFA ranking and known playing style?
+2. DEFENSIVE SOLIDITY: How many goals has each team conceded? Are there clean sheets? A strong defence under pressure often holds to 0 or 1 goal.
+3. FORM MOMENTUM: Which team is on a winning run vs a losing/drawing run? Does recent form suggest confidence or anxiety?
+4. STAKES: Does either team desperately need a win, or can one afford a draw? High-stakes games are often tighter and lower-scoring.
+5. QUALITY GAP: Is there a real difference in class (5+ FIFA ranking places, or a top-10 side vs a minnow), or is this roughly even? Only predict a 2+ goal winning margin if there is a clear, justified quality gap.
+6. LIKELY SCORELINE: Based on 1-5, pick the single most realistic scoreline. Most WC group games end 1-0, 1-1, 2-1, or 0-0. A 2-0 is valid for a clear favourite; 3-0 only for a genuine mismatch. Avoid forcing a winner — draws are common and realistic.
+
+The closing paragraph in the paragraphs array must explicitly reference at least two of the factors above to justify the predicted score.
+
 Return ONLY raw JSON (no markdown fences) with this exact shape:
 {
   "headline": "match title",
@@ -126,19 +136,14 @@ Return ONLY raw JSON (no markdown fences) with this exact shape:
     {"type": "p",  "text": "underdog body"},
     {"type": "h2", "text": "The Tactical Battle to Watch"},
     {"type": "p",  "text": "tactical body"},
-    {"type": "p",  "text": "closing sentence justifying the predicted score"}
+    {"type": "p",  "text": "closing paragraph that justifies the predicted score using specific reasons from the analysis above"}
   ],
   "pullQuote": "punchy one-liner — analysis, not a real attributed quote",
   "predictedHome": <integer>,
   "predictedAway": <integer>
 }
 
-PREDICTED SCORE RULES — read carefully:
-- Base the scoreline on the actual team strengths, FIFA rankings, form data, and tactical setup above.
-- World Cup group-stage scorelines are typically tight: 1-0, 1-1, 2-1, 0-0, and 2-0 are all common. 3+ goals is rarer and only fits if there is a clear mismatch.
-- If the teams are evenly matched, a draw (0-0 or 1-1) is a valid and realistic prediction — do not default to a win.
-- NEVER default to 2-0 out of habit. Each game must have a scoreline that reflects the specific matchup.
-- Do not include the pull-quote or predict-box in the paragraphs array.`;
+Do not include the pull-quote or predict-box in the paragraphs array.`;
 
   const completion = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
