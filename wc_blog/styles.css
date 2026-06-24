@@ -48,6 +48,12 @@ img { max-width: 100%; display: block; }
   padding: 0 24px;
 }
 
+.nav-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
 /* ---------- Nav ---------- */
 .site-nav {
   border-bottom: 1px solid var(--border);

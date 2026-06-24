@@ -190,8 +190,7 @@ function buildRecapHTML(match, content, previewSlug, priorPrediction, livePosts)
 <nav class="site-nav">
   <div class="wrap" style="display:flex; align-items:center; justify-content:space-between;">
     <div class="brand-block">
-      <a href="../index.html" class="brand">THE <span>DOSSIER</span></a>
-      <span class="brand-sub">by <a href="https://foreshot.net">Foreshot</a></span>
+      <a href="../index.html"><img src="../logo.png" alt="The Dossier" class="nav-logo"></a>
     </div>
     <div class="nav-right">
       <span class="nav-tag">World Cup 2026 · Match Reports</span>
