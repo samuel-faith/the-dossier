@@ -15,9 +15,28 @@ const DRAFTS_DIR  = path.join(ROOT, 'drafts');
 const POSTS_JSON  = path.join(ROOT, 'posts.json');
 const VOICE_GUIDE = fs.readFileSync(path.join(__dirname, 'voice-guide.md'), 'utf-8');
 
-const groq = new Groq({ apiKey: GROQ_API_KEY });
+const groq = new Groq({ apiKey: GROQ_API_KEY, maxRetries: 3, timeout: 120_000 });
 
 // ── helpers ───────────────────────────────────────────────────────────────────
+
+// Retry a flaky async call (Groq connections occasionally drop mid-response with
+// "Premature close" / "terminated" — a single failure must not zero out the run).
+async function withRetry(label, fn, attempts = 4, baseDelayMs = 4000) {
+  let lastErr;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (i < attempts) {
+        const wait = baseDelayMs * i;
+        console.warn(`  ${label} attempt ${i}/${attempts} failed: ${err.message}. Retrying in ${wait / 1000}s...`);
+        await new Promise(r => setTimeout(r, wait));
+      }
+    }
+  }
+  throw lastErr;
+}
 
 function slugify(str) {
   return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -145,19 +164,21 @@ Return ONLY raw JSON (no markdown fences) with this exact shape:
 
 Do not include the pull-quote or predict-box in the paragraphs array.`;
 
-  const completion = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [
-      { role: 'system', content: VOICE_GUIDE },
-      { role: 'user', content: prompt },
-    ],
-    temperature: 0.7,
-    max_tokens: 2000,
+  return withRetry('Groq preview', async () => {
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: VOICE_GUIDE },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+    const raw = completion.choices[0].message.content.trim()
+      .replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '')
+      .replace(/,(\s*[}\]])/g, '$1');
+    return JSON.parse(raw);
   });
-  const raw = completion.choices[0].message.content.trim()
-    .replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '')
-    .replace(/,(\s*[}\]])/g, '$1');
-  return JSON.parse(raw);
 }
 
 // ── HTML builder ──────────────────────────────────────────────────────────────
