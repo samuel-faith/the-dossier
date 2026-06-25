@@ -1,5 +1,77 @@
 [
   {
+    "slug": "switzerland-vs-canada-recap",
+    "group": "Group B",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "Switzerland vs Canada",
+    "hook": "Switzerland beat Canada 2-1 in World Cup 2026",
+    "type": "recap",
+    "featured": false,
+    "result": "2-1",
+    "previewSlug": "switzerland-vs-canada"
+  },
+  {
+    "slug": "south-africa-vs-south-korea-recap",
+    "group": "Group A",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "South Africa vs South Korea",
+    "hook": "South Africa wins tight World Cup match",
+    "type": "recap",
+    "featured": false,
+    "result": "1-0",
+    "previewSlug": "south-africa-vs-south-korea"
+  },
+  {
+    "slug": "scotland-vs-brazil-recap",
+    "group": "Group C",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "Scotland vs Brazil",
+    "hook": "Brazil dominates Scotland in Group C",
+    "type": "recap",
+    "featured": false,
+    "result": "0-3",
+    "previewSlug": "scotland-vs-brazil"
+  },
+  {
+    "slug": "morocco-vs-haiti-recap",
+    "group": "Group C",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "Morocco vs Haiti",
+    "hook": "Morocco wins 4-2 against Haiti in World Cup 2026",
+    "type": "recap",
+    "featured": false,
+    "result": "4-2",
+    "previewSlug": "morocco-vs-haiti"
+  },
+  {
+    "slug": "czechia-vs-mexico-recap",
+    "group": "Group A",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "Czechia vs Mexico",
+    "hook": "Mexico dominate Czechia in Group A",
+    "type": "recap",
+    "featured": false,
+    "result": "0-3",
+    "previewSlug": "czechia-vs-mexico"
+  },
+  {
+    "slug": "bosnia-herzegovina-vs-qatar-recap",
+    "group": "Group B",
+    "date": "2026-06-24",
+    "dateLabel": "Jun 24",
+    "fixture": "Bosnia-Herzegovina vs Qatar",
+    "hook": "Bosnia-Herzegovina wins 3-1 against Qatar",
+    "type": "recap",
+    "featured": false,
+    "result": "3-1",
+    "previewSlug": "bosnia-herzegovina-vs-qatar"
+  },
+  {
     "slug": "south-africa-vs-canada",
     "group": "Group Stage",
     "date": "2026-06-28",
